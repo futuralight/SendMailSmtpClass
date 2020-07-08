@@ -1,0 +1,12 @@
+{
+    "name": "futuralight/yandex-xoauth-mail-sender",
+    "description": "php yandex XOAUTH sender",
+    "type": "library",
+    "minimum-stability": "beta",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Futuralight\\YandexMailSender": "src/"
+        }
+    }
+}

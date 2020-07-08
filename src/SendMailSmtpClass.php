@@ -18,6 +18,10 @@
  * @author Ipatov Evgeniy <admin@vk-book.ru>
  * @version 1.1
  */
+
+namespace Futuralight\YandexMailSender;
+
+
 class SendMailSmtpClass
 {
 
@@ -47,7 +51,12 @@ class SendMailSmtpClass
 	public $multipart;
 	public $arrayCC;
 	public $arrayBCC;
+	public $token;
+	public $Subject;
+	public $Body;
 	private $addresses = [];
+	private $from = [];
+	private $messageContent;
 
 	public function __construct($smtp_username, $token, $smtp_host = 'ssl://smtp.yandex.com', $smtp_port = 465, $smtp_charset = "utf-8")
 	{
@@ -82,10 +91,29 @@ class SendMailSmtpClass
 		];
 	}
 
-	function send($mailTo, $subject, $message, $smtp_from)
+	public function setFrom($email, $name)
+	{
+		$this->from['address'] = $email;
+		$this->from['name'] = $name;
+	}
+
+
+	private function getMailAdressesString()
+	{
+		$mailString = '';
+		foreach ($this->addresses as $address) {
+			$mailString .= $address['name'] . ' ' . $address['address'] . ', ';
+		}
+		return $mailString = trim($mailString, ', ');
+	}
+
+
+	function send()
 	{
 		// подготовка содержимого письма к отправке
-		$contentMail = $this->getContentMail($subject, $message, $smtp_from, $mailTo);
+		$mailString = $this->getMailAdressesString();
+
+		$this->messageContent = $this->getContentMail($mailString);
 
 		$context = stream_context_create();
 		stream_context_set_option($context, 'ssl', 'passphrase', '');
@@ -93,10 +121,10 @@ class SendMailSmtpClass
 		stream_context_set_option($context, 'ssl', 'verify_peer', false);
 		try {
 			if (!$socket = @stream_socket_client($this->smtp_host . ':' . $this->smtp_port, $errorNumber, $errorDescription, 30, STREAM_CLIENT_CONNECT, $context)) {
-				throw new Exception($errorNumber . "." . $errorDescription);
+				throw new \Exception($errorNumber . "." . $errorDescription);
 			}
 			if (!$this->_parseServer($socket, "220")) {
-				throw new Exception('Connection error');
+				throw new \Exception('Connection error');
 			}
 
 			$server_name = 'sender.example.com';
@@ -106,7 +134,7 @@ class SendMailSmtpClass
 				fputs($socket, "HELO $server_name\r\n");
 				if (!$this->_parseServer($socket, "250")) {
 					fclose($socket);
-					throw new Exception('Error of command sending: HELO');
+					throw new \Exception('Error of command sending: HELO');
 				}
 			}
 
@@ -114,7 +142,7 @@ class SendMailSmtpClass
 			fputs($socket, "AUTH XOAUTH2 {$base64}\r\n");
 			if (!$this->_parseServer($socket, "235")) { //535 235
 				fclose($socket);
-				throw new Exception('Autorization error');
+				throw new \Exception('Autorization error');
 			}
 
 			// fputs($socket, base64_encode($this->smtp_username) . "\r\n");
@@ -132,25 +160,39 @@ class SendMailSmtpClass
 			fputs($socket, "MAIL FROM: <" . $this->smtp_username . ">\r\n");
 			if (!$this->_parseServer($socket, "250")) {
 				fclose($socket);
-				throw new Exception('Error of command sending: MAIL FROM');
+				throw new \Exception('Error of command sending: MAIL FROM');
 			}
 
-			$mailTo = str_replace(" ", "", $mailTo);
-			$emails_to_array = explode(',', $mailTo);
-			foreach ($emails_to_array as $email) {
-				fputs($socket, "RCPT TO: <{$email}>\r\n");
+
+			// $mailTo = str_replace(" ", "", $mailTo);
+			// $emails_to_array = explode(',', $mailTo);
+			// foreach ($emails_to_array as $email) {
+			// 	fputs($socket, "RCPT TO: <{$email}>\r\n");
+			// 	if (!$this->_parseServer($socket, "250")) {
+			// 		fclose($socket);
+			// 		throw new Exception('Error of command sending: RCPT TO');
+			// 	}
+			// }
+
+
+			foreach ($this->addresses as $address) {
+				fputs($socket, "RCPT TO: <{$address['address']}>\r\n");
 				if (!$this->_parseServer($socket, "250")) {
 					fclose($socket);
-					throw new Exception('Error of command sending: RCPT TO');
+					throw new \Exception('Error of command sending: RCPT TO');
 				}
 			}
+
+
+
+
 			// если есть кому отправить копию
 			if (!empty($this->arrayCC)) {
 				foreach ($this->arrayCC as $emailCC) {
 					fputs($socket, "RCPT TO: <{$emailCC}>\r\n");
 					if (!$this->_parseServer($socket, "250")) {
 						fclose($socket);
-						throw new Exception('Error of command sending: RCPT TO');
+						throw new \Exception('Error of command sending: RCPT TO');
 					}
 				}
 			}
@@ -160,7 +202,7 @@ class SendMailSmtpClass
 					fputs($socket, "RCPT TO: <{$emailBCC}>\r\n");
 					if (!$this->_parseServer($socket, "250")) {
 						fclose($socket);
-						throw new Exception('Error of command sending: RCPT TO');
+						throw new \Exception('Error of command sending: RCPT TO');
 					}
 				}
 			}
@@ -168,24 +210,24 @@ class SendMailSmtpClass
 			fputs($socket, "DATA\r\n");
 			if (!$this->_parseServer($socket, "354")) {
 				fclose($socket);
-				throw new Exception('Error of command sending: DATA');
+				throw new \Exception('Error of command sending: DATA');
 			}
 
-			fputs($socket, $contentMail . "\r\n.\r\n");
+			fputs($socket, $this->messageContent . "\r\n.\r\n");
 			if (!$this->_parseServer($socket, "250")) {
 				fclose($socket);
-				throw new Exception("E-mail didn't sent");
+				throw new \Exception("E-mail didn't sent");
 			}
 
 			fputs($socket, "QUIT\r\n");
 			fclose($socket);
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			return  $e->getMessage();
 		}
 		return true;
 	}
 
-	private function encryptAuthString()
+	public function encryptAuthString()
 	{
 		return base64_encode("user={$this->smtp_username}\001auth=Bearer {$this->token}\001\001");
 	}
@@ -195,7 +237,7 @@ class SendMailSmtpClass
 	{
 		$file = @fopen($path, "rb");
 		if (!$file) {
-			throw new Exception("File `{$path}` didn't open");
+			throw new \Exception("File `{$path}` didn't open");
 		}
 		$data = fread($file,  filesize($path));
 		fclose($file);
@@ -240,14 +282,14 @@ class SendMailSmtpClass
 	}
 
 	// подготовка содержимого письма
-	private function getContentMail($subject, $message, $smtp_from, $mailTo)
+	private function getContentMail($mailTo)
 	{
 		// если кодировка windows-1251, то перекодируем тему
 		if (strtolower($this->smtp_charset) == "windows-1251") {
-			$subject = iconv('utf-8', 'windows-1251', $subject);
+			$this->Subject = iconv('utf-8', 'windows-1251', $this->Subject);
 		}
 		$contentMail = "Date: " . date("D, d M Y H:i:s") . " UT\r\n";
-		$contentMail .= 'Subject: =?' . $this->smtp_charset . '?B?'  . base64_encode($subject) . "=?=\r\n";
+		$contentMail .= 'Subject: =?' . $this->smtp_charset . '?B?'  . base64_encode($this->Subject) . "=?=\r\n";
 
 		// заголовок письма
 		$headers = "MIME-Version: 1.0\r\n";
@@ -258,7 +300,11 @@ class SendMailSmtpClass
 		} else {
 			$headers .= "Content-type: text/html; charset={$this->smtp_charset}\r\n";
 		}
-		$headers .= "From: {$smtp_from[0]} <{$smtp_from[1]}>\r\n"; // от кого письмо
+		if (isset($this->from['name']) && $this->from['address']) {
+			$headers .= "From: {$this->from['name']} <{$this->from['address']}>\r\n"; // от кого письмо
+		} else {
+			$headers .= "From:<{$this->smtp_username}>\r\n"; // от кого письмо
+		}
 		$headers .= "To: " . $mailTo . "\r\n"; // кому
 
 		// если есть кому отправить копию
@@ -283,7 +329,7 @@ class SendMailSmtpClass
 			$multipart .= "Content-Type: text/html; charset=utf-8\r\n";
 			$multipart .= "Content-Transfer-Encoding: base64\r\n";
 			$multipart .= "\r\n";
-			$multipart .= chunk_split(base64_encode($message));
+			$multipart .= chunk_split(base64_encode($this->Body));
 
 			// файлы
 			$multipart .= $this->multipart;
@@ -291,7 +337,7 @@ class SendMailSmtpClass
 
 			$contentMail .= $multipart;
 		} else {
-			$contentMail .= $message . "\r\n";
+			$contentMail .= $this->Body . "\r\n";
 		}
 
 		// если кодировка windows-1251, то все письмо перекодируем
@@ -312,5 +358,33 @@ class SendMailSmtpClass
 	public function toHideCopy($email)
 	{
 		$this->arrayBCC[] = $email;
+	}
+
+	public function copyToFolder($encoding = true)
+	{
+		// $message = $this->getSentMIMEMessage();
+
+		$nameFolder = ($encoding) ? mb_convert_encoding(
+			'Отправленные',
+			"UTF7-IMAP",
+			"UTF8"
+		) : "Sent";
+
+		$nameFolder = 'Sent';
+		// $imap_host = "{imap.yandex.ru:993/imap/ssl}" . $nameFolder;
+		// $imap_stream = imap_open($imap_host, $this->Username, $this->Password) or die();
+		// if (!$imap_stream) {
+		// 	return ("can't connect: " . imap_last_error());
+		// }
+		// imap_check($imap_stream);
+		// imap_append($imap_stream, $imap_host, $message);
+		// imap_close($imap_stream);
+		// if (isset($this->from['name']) && $this->from['address']) {
+		// 	$name = "<{$this->from['name']}> <{$this->from['address']}>"; // от кого письмо
+		// } else {
+			$name = "{$this->smtp_username}"; // от кого письмо
+		// }
+		$imap = new Imap($this->smtp_username, $this->token);
+		$imap->appendMessage($nameFolder, $this->messageContent, $name, $this->getMailAdressesString(), $this->Subject, '', '1.0', 'text/html');
 	}
 }
