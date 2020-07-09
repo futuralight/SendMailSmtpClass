@@ -233,8 +233,7 @@ class Smtp
 	// добавление файла в письмо
 	public function addFile($path)
 	{
-		if($path[0] != '/')
-		{
+		if ($path[0] != '/') {
 			$path = __DIR__ . '/' . $path;
 		}
 		$file = @fopen($path, "rb");
@@ -362,30 +361,14 @@ class Smtp
 		$this->arrayBCC[] = $email;
 	}
 
-	public function copyToFolder($encoding = true)
+	public function copyToFolder($encoding = false)
 	{
-		// $message = $this->getSentMIMEMessage();
-
 		$nameFolder = ($encoding) ? mb_convert_encoding(
 			'Отправленные',
 			"UTF7-IMAP",
 			"UTF8"
 		) : "Sent";
-
-		$nameFolder = 'Sent';
-		// $imap_host = "{imap.yandex.ru:993/imap/ssl}" . $nameFolder;
-		// $imap_stream = imap_open($imap_host, $this->Username, $this->Password) or die();
-		// if (!$imap_stream) {
-		// 	return ("can't connect: " . imap_last_error());
-		// }
-		// imap_check($imap_stream);
-		// imap_append($imap_stream, $imap_host, $message);
-		// imap_close($imap_stream);
-		// if (isset($this->from['name']) && $this->from['address']) {
-		// 	$name = "<{$this->from['name']}> <{$this->from['address']}>"; // от кого письмо
-		// } else {
-			$name = "{$this->smtp_username}"; // от кого письмо
-		// }
+		$name = "{$this->smtp_username}";
 		$imap = new Imap($this->smtp_username, $this->token);
 		$imap->appendMessage($nameFolder, $this->messageContent, $name, $this->getMailAdressesString(), $this->Subject, '', '1.0', 'text/html', false);
 	}

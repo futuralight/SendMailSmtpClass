@@ -93,7 +93,6 @@ class Imap
         $command = "APPEND \"$mailbox\" $flags {" . $size . "}" . $crlf . $composedMessage;
 
         $this->sendCommand("A" . $this->codeCounter . ' ' . $command);
-        $this->readResponse("A" . $this->codeCounter);
         return true;
     }
 
