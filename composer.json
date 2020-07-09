@@ -6,7 +6,7 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "Futuralight\\YandexMailSender": "src/"
+            "Futuralight\\YandexMailSender\\": "src/"
         }
     }
 }

@@ -60,7 +60,7 @@ class Imap
         }
     }
 
-    public function appendMessage($mailbox, $message, $from = "", $to = "", $subject = "", $messageId = "", $mimeVersion = "", $contentType = "", $flags = "(\Seen)")
+    public function appendMessage($mailbox, $message, $from = "", $to = "", $subject = "", $messageId = "", $mimeVersion = "", $contentType = "", $formData = true, $flags = "(\Seen)")
     {
         if (!isset($mailbox) || !strlen($mailbox)) return false;
         if (!isset($message) || !strlen($message)) return false;
@@ -68,27 +68,32 @@ class Imap
 
         $date = date('d-M-Y H:i:s O');
         $crlf = "\r\n";
+        if ($formData) {
+            if (strlen($from)) $from = "From: $from";
+            if (strlen($to)) $to = "To: $to";
+            if (strlen($subject)) $subject = "Subject: $subject";
+            $messageId = (strlen($messageId)) ? "Message-Id: $messageId" : "Message-Id: " . uniqid();
+            $mimeVersion = (strlen($mimeVersion)) ? "MIME-Version: $mimeVersion" : "MIME-Version: 1.0";
+            $contentType = (strlen($contentType)) ? "Content-Type: $contentType" : "Content-Type: TEXT/HTML;CHARSET=UTF-8";
 
-        if (strlen($from)) $from = "From: $from";
-        if (strlen($to)) $to = "To: $to";
-        if (strlen($subject)) $subject = "Subject: $subject";
-        $messageId = (strlen($messageId)) ? "Message-Id: $messageId" : "Message-Id: " . uniqid();
-        $mimeVersion = (strlen($mimeVersion)) ? "MIME-Version: $mimeVersion" : "MIME-Version: 1.0";
-        $contentType = (strlen($contentType)) ? "Content-Type: $contentType" : "Content-Type: TEXT/PLAIN;CHARSET=UTF-8";
-
-        $composedMessage = $date . $crlf;
-        if (strlen($from)) $composedMessage .= $from . $crlf;
-        if (strlen($subject)) $composedMessage .= $subject . $crlf;
-        if (strlen($to)) $composedMessage .= $to . $crlf;
-        $composedMessage .= $messageId . $crlf;
-        $composedMessage .= $mimeVersion . $crlf;
-        $composedMessage .= $contentType . $crlf . $crlf;
-        $composedMessage .= $message . $crlf;
+            $composedMessage = $date . $crlf;
+            if (strlen($from)) $composedMessage .= $from . $crlf;
+            if (strlen($subject)) $composedMessage .= $subject . $crlf;
+            if (strlen($to)) $composedMessage .= $to . $crlf;
+            $composedMessage .= $messageId . $crlf;
+            $composedMessage .= $mimeVersion . $crlf;
+            $composedMessage .= $contentType . $crlf . $crlf;
+            $composedMessage .= $message . $crlf;
+        } else {
+            $composedMessage = $message;
+        }
         $size = strlen($composedMessage);
+
 
         $command = "APPEND \"$mailbox\" $flags {" . $size . "}" . $crlf . $composedMessage;
 
         $this->sendCommand("A" . $this->codeCounter . ' ' . $command);
+        $this->readResponse("A" . $this->codeCounter);
         return true;
     }
 

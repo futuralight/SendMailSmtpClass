@@ -1,7 +1,7 @@
 <?php
 // пример использования SendMailSmtpClass.php
 
-require_once "SendMailSmtpClass.php"; // подключаем класс
+require_once "Smtp.php"; // подключаем класс
 require_once "Imap.php"; // подключаем класс
 
 
@@ -19,7 +19,7 @@ require_once "Imap.php"; // подключаем класс
 
 // die();
 // примеры подключения	
-$mailSMTP = new Futuralight\YandexMailSender\SendMailSmtpClass('m.yurin@ankas.ru', 'AgAEA7qjSAUEAAZdi2-ySeSWtEoJv-1t76nWiOY', 'ssl://smtp.yandex.ru', 465, "UTF-8");
+$mailSMTP = new Futuralight\YandexMailSender\Smtp('m.yurin@ankas.ru', 'AgAEA7qjSAUEAAZdi2-ySeSWtEoJv-1t76nWiOY', 'ssl://smtp.yandex.ru', 465, "UTF-8");
 // $mailSMTP = new SendMailSmtpClass('zhenikipatov@yandex.ru', '***', 'ssl://smtp.yandex.ru', 465, "windows-1251");
 // $mailSMTP = new SendMailSmtpClass('monitor.test@mail.ru', '***', 'ssl://smtp.mail.ru', 465, "UTF-8");
 // $mailSMTP = new SendMailSmtpClass('red@mega-dev.ru', '***', 'ssl://smtp.beget.com', 465, "UTF-8");
@@ -64,10 +64,10 @@ $message = '<body style="margin: 0; padding: 0;">
    </body>
 	';
 
-$mailSMTP->Subject = 'Novya tema';
+$mailSMTP->Subject = 'Тема';
 $mailSMTP->Body = $message;
 // отправляем письмо
-$result =  $mailSMTP->send('Тема письма с копиями ');
+$result =  $mailSMTP->send();
 
 $mailSMTP->copyToFolder();
 // $result =  $mailSMTP->send('Кому письмо', 'Тема письма', 'Текст письма', 'Отправитель письма');

@@ -22,7 +22,7 @@
 namespace Futuralight\YandexMailSender;
 
 
-class SendMailSmtpClass
+class Smtp
 {
 
 	/**
@@ -112,9 +112,7 @@ class SendMailSmtpClass
 	{
 		// подготовка содержимого письма к отправке
 		$mailString = $this->getMailAdressesString();
-
 		$this->messageContent = $this->getContentMail($mailString);
-
 		$context = stream_context_create();
 		stream_context_set_option($context, 'ssl', 'passphrase', '');
 		stream_context_set_option($context, 'ssl', 'allow_self_signed', true);
@@ -235,6 +233,11 @@ class SendMailSmtpClass
 	// добавление файла в письмо
 	public function addFile($path)
 	{
+		if($path[0] != '/')
+		{
+			$path = __DIR__ . '/' . $path;
+		}
+		die($path);
 		$file = @fopen($path, "rb");
 		if (!$file) {
 			throw new \Exception("File `{$path}` didn't open");
@@ -385,6 +388,6 @@ class SendMailSmtpClass
 			$name = "{$this->smtp_username}"; // от кого письмо
 		// }
 		$imap = new Imap($this->smtp_username, $this->token);
-		$imap->appendMessage($nameFolder, $this->messageContent, $name, $this->getMailAdressesString(), $this->Subject, '', '1.0', 'text/html');
+		$imap->appendMessage($nameFolder, $this->messageContent, $name, $this->getMailAdressesString(), $this->Subject, '', '1.0', 'text/html', false);
 	}
 }
