@@ -38,7 +38,7 @@ $to = 'greedthegangboss@gmail.com';
 
 // добавляем файлы
 // $mailSMTP->addFile("test.jpg");
-$mailSMTP->addFile("/home/maksim/www/SendMailSmtpClass/src/alt.jpg");
+// $mailSMTP->addFile("/home/maksim/www/SendMailSmtpClass/src/alt.jpg");
 // $mailSMTP->addFile("test3.txt");
 // // $mailSMTP->addAddress("mail@gs.cs", 'name');
 $mailSMTP->addAddress($to, 'Босс');
@@ -64,7 +64,7 @@ $message = '<body style="margin: 0; padding: 0;">
    </body>
 	';
 
-$mailSMTP->Subject = 'Тема';
+$mailSMTP->Subject = 'AUTJ';
 $mailSMTP->Body = $message;
 // отправляем письмо
 $result =  $mailSMTP->send();
@@ -75,5 +75,7 @@ $mailSMTP->copyToFolder();
 if ($result === true) {
 	echo "Done";
 } else {
-	echo "Error: " . $result;
+	echo $result;
 }
+
+// 'Autorization error' 'Error of command sending: MAIL FROM';

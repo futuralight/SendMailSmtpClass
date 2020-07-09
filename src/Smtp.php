@@ -237,7 +237,6 @@ class Smtp
 		{
 			$path = __DIR__ . '/' . $path;
 		}
-		die($path);
 		$file = @fopen($path, "rb");
 		if (!$file) {
 			throw new \Exception("File `{$path}` didn't open");
