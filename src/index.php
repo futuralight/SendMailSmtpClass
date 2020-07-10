@@ -29,12 +29,18 @@ $mailSMTP = new Futuralight\YandexMailSender\Smtp('m.yurin@ankas.ru', 'AgAEA7qjS
 // $mailSMTP = new SendMailSmtpClass('логин', 'пароль', 'хост', 'порт', 'кодировка письма');
 
 // от кого
+
+//dXNlcj12aWV3a2V5MTQ4OEB5YW5kZXgucnUBYXV0aD1CZWFyZXIgQWdBQUFBQVlWN2JGQUFaZGkzR0FFdjM1aFUtUWppOXpiV0lIWkN3AQE=
+//dXNlcj1tLnl1cmluQGFua2FzLnJ1AWF1dGg9QmVhcmVyIEFnQUVBN3FqU0FVRUFBWmRpMi15U2VTV3RFb0p2LTF0NzZuV2lPWQEB
+
 $from = array(
 	"Евгений", // Имя отправителя
 	"m.yurin@ankas.ru" // почта отправителя
 );
 // кому отправка. Можно указывать несколько получателей через запятую
 $to = 'greedthegangboss@gmail.com';
+$to = 'viewkey1488@yandex.ru'; //AgAAAAAYV7bFAAZdi3GAEv35hU-Qji9zbWIHZCw
+$to = 'm.yurin@ankas.ru'; //AgAEA7qjSAUEAAZdi2-ySeSWtEoJv-1t76nWiOY
 
 // добавляем файлы
 // $mailSMTP->addFile("test.jpg");
@@ -42,7 +48,7 @@ $to = 'greedthegangboss@gmail.com';
 // $mailSMTP->addFile("test3.txt");
 // // $mailSMTP->addAddress("mail@gs.cs", 'name');
 $mailSMTP->addAddress($to, 'Босс');
-$mailSMTP->setFrom('m.yurin@ankas.ru', 'Почта');
+$mailSMTP->setFrom('viewkey1488@yandex.ru', 'Почта');
 
 
 // $mailSMTP->addFileBase64();
@@ -67,7 +73,12 @@ $message = '<body style="margin: 0; padding: 0;">
 $mailSMTP->Subject = 'AUTJ';
 $mailSMTP->Body = $message;
 // отправляем письмо
+$mailSMTP->getFolders();
 $result =  $mailSMTP->send();
+
+echo $mailSMTP->encryptAuthString();
+echo PHP_EOL;
+echo $mailSMTP->messageContent;
 
 $mailSMTP->copyToFolder();
 // $result =  $mailSMTP->send('Кому письмо', 'Тема письма', 'Текст письма', 'Отправитель письма');

@@ -56,7 +56,7 @@ class Smtp
 	public $Body;
 	private $addresses = [];
 	private $from = [];
-	private $messageContent;
+	public $messageContent;
 
 	public function __construct($smtp_username, $token, $smtp_host = 'ssl://smtp.yandex.com', $smtp_port = 465, $smtp_charset = "utf-8")
 	{
@@ -371,5 +371,11 @@ class Smtp
 		$name = "{$this->smtp_username}";
 		$imap = new Imap($this->smtp_username, $this->token);
 		$imap->appendMessage($nameFolder, $this->messageContent, $name, $this->getMailAdressesString(), $this->Subject, '', '1.0', 'text/html', false);
+	}
+
+	public function getFolders()
+	{
+		$imap = new Imap($this->smtp_username, $this->token);
+		return $imap->listFolders();
 	}
 }

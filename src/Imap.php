@@ -93,6 +93,7 @@ class Imap
         $command = "APPEND \"$mailbox\" $flags {" . $size . "}" . $crlf . $composedMessage;
 
         $this->sendCommand("A" . $this->codeCounter . ' ' . $command);
+        $this->readResponse("A" . $this->codeCounter);
         return true;
     }
 
@@ -129,5 +130,27 @@ class Imap
         }
         $this->codeCounter++;
         return $response;
+    }
+
+    public function listFolders()
+    {
+        $this->sendCommand("A" . $this->codeCounter . ' ' . "LIST \"\" \"*\"");
+        $response = $this->readResponse("A" . $this->codeCounter);
+        $line = $response[0][0];
+        $statusString = explode("*", $line);
+        $totalStrings = count($statusString);
+        $statusArray = array();
+        $finalFolders = array();
+        for ($i = 1; $i < $totalStrings; $i++) {
+
+            $statusArray[$i] = explode("\"/\" ", $statusString[$i]);
+
+            if (!strpos($statusArray[$i][0], "\Noselect")) {
+                $folder = str_replace("\"", "", $statusArray[$i][0]);
+                array_push($finalFolders, $folder);
+            }
+        }
+
+        return $finalFolders;
     }
 }
