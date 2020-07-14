@@ -14,12 +14,12 @@ require_once "Imap.php"; // подключаем класс
 
 
 
-
+// die(base64_encode("user=zhigalov@ankas.ru\001auth=Bearer AgAEA7qiJoHpAAZehHuN9eiv8kFipzwWMsyES38\001\001"));
 
 
 // die();
 // примеры подключения	
-$mailSMTP = new Futuralight\YandexMailSender\Smtp('m.yurin@ankas.ru', 'AgAEA7qjSAUEAAZdi2-ySeSWtEoJv-1t76nWiOY', 'ssl://smtp.yandex.ru', 465, "UTF-8");
+$mailSMTP = new Futuralight\YandexMailSender\Smtp('viewkey1488@yandex.ru', 'AgAAAAAYV7bFAAZdi3GAEv35hU-Qji9zbWIHZCw', 'ssl://smtp.yandex.ru', 465, "UTF-8");
 // $mailSMTP = new SendMailSmtpClass('zhenikipatov@yandex.ru', '***', 'ssl://smtp.yandex.ru', 465, "windows-1251");
 // $mailSMTP = new SendMailSmtpClass('monitor.test@mail.ru', '***', 'ssl://smtp.mail.ru', 465, "UTF-8");
 // $mailSMTP = new SendMailSmtpClass('red@mega-dev.ru', '***', 'ssl://smtp.beget.com', 465, "UTF-8");
@@ -39,8 +39,8 @@ $from = array(
 );
 // кому отправка. Можно указывать несколько получателей через запятую
 $to = 'greedthegangboss@gmail.com';
-$to = 'viewkey1488@yandex.ru'; //AgAAAAAYV7bFAAZdi3GAEv35hU-Qji9zbWIHZCw
-$to = 'm.yurin@ankas.ru'; //AgAEA7qjSAUEAAZdi2-ySeSWtEoJv-1t76nWiOY
+// $to = 'viewkey1488@yandex.ru'; //AgAAAAAYV7bFAAZdi3GAEv35hU-Qji9zbWIHZCw
+// $to = 'm.yurin@ankas.ru'; //AgAEA7qjSAUEAAZdi2-ySeSWtEoJv-1t76nWiOY
 
 // добавляем файлы
 // $mailSMTP->addFile("test.jpg");
@@ -81,6 +81,7 @@ echo PHP_EOL;
 echo $mailSMTP->messageContent;
 
 $mailSMTP->copyToFolder();
+$mailSMTP->copyToFolder(true);
 // $result =  $mailSMTP->send('Кому письмо', 'Тема письма', 'Текст письма', 'Отправитель письма');
 
 if ($result === true) {

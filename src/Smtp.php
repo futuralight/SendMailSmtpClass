@@ -102,9 +102,9 @@ class Smtp
 	{
 		$mailString = '';
 		foreach ($this->addresses as $address) {
-			$mailString .= $address['name'] . ' ' . $address['address'] . ', ';
+			$mailString .=  ''. $address['name'] . ' <' . $address['address'] . '>, ';
 		}
-		return $mailString = trim($mailString, ', ');
+		return trim($mailString, ', ');
 	}
 
 
