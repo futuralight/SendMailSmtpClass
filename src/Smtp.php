@@ -302,9 +302,9 @@ class Smtp
 			$headers .= "Content-type: text/html; charset={$this->smtp_charset}\r\n";
 		}
 		if (isset($this->from['name']) && $this->from['address']) {
-			$headers .= "From: {$this->from['name']} <{$this->from['address']}>\r\n"; // от кого письмо
+			$headers .= "From: \"{$this->from['name']}\" <{$this->from['address']}>\r\n"; // от кого письмо
 		} else {
-			$headers .= "From:<{$this->smtp_username}>\r\n"; // от кого письмо
+			$headers .= "From: \"{$this->smtp_username}\"\r\n"; // от кого письмо
 		}
 		$headers .= "To: " . $mailTo . "\r\n"; // кому
 
