@@ -58,7 +58,7 @@ class Smtp
 	private $from = [];
 	public $messageContent;
 
-	public function __construct($smtp_username, $token, $smtp_host = 'ssl://smtp.yandex.com', $smtp_port = 465, $smtp_charset = "utf-8")
+	public function __construct($smtp_username, $token, $smtp_host = 'ssl://smtp.yandex.com', $smtp_port = 465, $smtp_charset = "UTF-8")
 	{
 		$this->smtp_username = $smtp_username;
 		$this->token = $token;
@@ -102,7 +102,7 @@ class Smtp
 	{
 		$mailString = '';
 		foreach ($this->addresses as $address) {
-			$mailString .=  ''. $address['name'] . ' <' . $address['address'] . '>, ';
+			$mailString .=  '' . $address['name'] . ' <' . $address['address'] . '>, ';
 		}
 		return trim($mailString, ', ');
 	}
@@ -289,8 +289,9 @@ class Smtp
 		if (strtolower($this->smtp_charset) == "windows-1251") {
 			$this->Subject = iconv('utf-8', 'windows-1251', $this->Subject);
 		}
-		$contentMail = "Date: " . date("D, d M Y H:i:s") . " UT\r\n";
-		$contentMail .= 'Subject: =?' . $this->smtp_charset . '?B?'  . base64_encode($this->Subject) . "=?=\r\n";
+		$contentMail = "Date: " . date("D, d M Y H:i:s") . "\r\n";
+		// $contentMail .= 'Subject: =?' . $this->smtp_charset . '?B?'  . base64_encode($this->Subject) . "=?=\r\n";
+		$contentMail .= "Subject: {$this->Subject}\r\n";
 
 		// заголовок письма
 		$headers = "MIME-Version: 1.0\r\n";
@@ -340,6 +341,7 @@ class Smtp
 		} else {
 			$contentMail .= $this->Body . "\r\n";
 		}
+
 
 		// если кодировка windows-1251, то все письмо перекодируем
 		if (strtolower($this->smtp_charset) == "windows-1251") {
